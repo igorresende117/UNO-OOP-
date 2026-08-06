@@ -14,8 +14,6 @@ import cartas.enums.Naipe;
 import jogadores.Jogador;
 import jogadores.ListaJogadores;
 
-import java.util.Scanner;
-
 public class Jogo {
     private ListaJogadores lista;
     private Jogador atual; //Ponteiro principal que diz de quem é a vez
@@ -27,14 +25,6 @@ public class Jogo {
     private Cor corAtualAtiva;
     private Naipe naipeAtualAtivo;
     private ModoJogo modo;
-
-    Scanner scanner = new Scanner(System.in);
-
-    public Jogo() {
-        this.lista = new ListaJogadores();
-        this.sentidoHorario = true;
-        this.iniciarPartida();
-    }
 
     public ListaJogadores getLista() { return this.lista; }
 
@@ -64,56 +54,23 @@ public class Jogo {
         this.naipeAtualAtivo = naipe;
     }
 
-    public void iniciarPartida() {
+    //Recebe os nomes e o modo diretamente da Interface Gráfica
+    public Jogo(java.util.ArrayList<String> nomesJogadores, int modoEscolhido) {
+        this.lista = new ListaJogadores();
+        this.sentidoHorario = true;
+
+        //Cadastra os jogadores na lista duplamente encadeada
+        for (String nome : nomesJogadores) {
+            this.lista.adicionaJogadorFinal(new Jogador(nome));
+        }
+
+        this.atual = lista.getHead(); //Define o primeiro a jogar
+        this.iniciarPartida(modoEscolhido);
+    }
+
+    public void iniciarPartida(int modo) {
         CartaUNO cTopoUNO;
         CartaCOMUM cTopoCOMUM;
-
-        //Configuração (Adição/Remoção de Jogadores)
-        System.out.println("1- Novo jogador; 2- Remove último jogador; 3- Iniciar" + '\n');
-        System.out.println("Digite uma opção: ");
-        int opcao = scanner.nextInt();
-        scanner.nextLine();
-
-        while(opcao != 3 || this.lista.getQuant() < 2) {
-            if(opcao == 1) {
-                System.out.println("Digite um nome: ");
-                String nome = scanner.nextLine();
-                Jogador j = new Jogador(nome);
-
-                this.lista.adicionaJogadorFinal(j);
-                this.atual = lista.getHead();
-            }
-            if(opcao == 2) {
-                if(!this.lista.isEmpty()) {
-                    System.out.println("Jogador(a) " + this.lista.getTail().getNome() + " removido!");
-                    this.lista.removeJogadorFinal();
-                } else {
-                    System.out.println("Nenhum jogador na lista para remover!");
-                }
-            }
-            if(opcao == 3) {
-                System.out.println("É necessário pelo menos 2 jogadores para iniciar a partida!");
-            }
-            if(opcao > 3 || opcao < 1) {
-                System.out.println("Opção inválida!");
-            }
-
-            System.out.println("1- Novo jogador; 2- Remove último jogador; 3- Iniciar" + '\n');
-            System.out.println("Digite uma opção: ");
-            opcao = scanner.nextInt();
-            scanner.nextLine();
-        }
-
-        //Seleção das Regras e Criação dos Baralhos
-        System.out.println("Modo de jogo (1- OFICIAL; 2- CONVENCIONAL): ");
-        int modo = scanner.nextInt();
-        scanner.nextLine();
-
-        while(modo != 1 && modo != 2) {
-            System.out.println("Opção inválida! Modo de jogo (1- OFICIAL; 2- CONVENCIONAL): ");
-            modo = scanner.nextInt();
-            scanner.nextLine();
-        }
 
         if(modo == 1) {
             this.modo = ModoJogo.OFICIAL;
@@ -130,10 +87,10 @@ public class Jogo {
                 for(int j = 0; j < 7; j++) {
                     this.atual.comprarCarta(this.pilhaCompra);
                 }
-                this.atual = atual.getEsq(); //Avança para dar as cartas ao próximo
+                this.atual = atual.getEsq();
             }
 
-            //Regra Oficial: o jogo não pode começar com um +4 na mesa
+            //O jogo não pode começar com um +4 na mesa
             while(cTopoUNO.getAcao() == AcaoUNO.WILD_MAIS_4) {
                 this.pilhaCompra.push(this.pilhaDescarte.pop());
                 this.pilhaCompra.embaralha();
@@ -142,21 +99,8 @@ public class Jogo {
                 cTopoUNO = (CartaUNO) this.pilhaDescarte.peek();
             }
 
-            System.out.print("\nCarta inicial na mesa: ");
-            cTopoUNO.imprimirCarta();
-
             //Aplica o efeito da primeira carta no jogador atual
             cTopoUNO.aplicaEfeito(this);
-
-            //Loop Principal da Partida (UNO)
-            this.atual.jogarTurno(this);
-            while(checarVencedor() == null) {
-                passarTurno(); //Gira a lista duplamente encadeada
-                System.out.print("\nCarta na mesa: ");
-                cTopoUNO.imprimirCarta();
-                this.atual.jogarTurno(this);
-            }
-            System.out.println("\nFIM DE JOGO! O vencedor é: " + checarVencedor().getNome());
         }
 
         if(modo == 2) {
@@ -192,16 +136,6 @@ public class Jogo {
 
             //Aplica o efeito da primeira carta no jogador atual
             cTopoCOMUM.aplicaEfeito(this);
-
-            //Loop Principal da Partida (Baralho Comum)
-            this.atual.jogarTurno(this);
-            while(checarVencedor() == null) {
-                passarTurno(); //Gira a lista duplamente encadeada
-                System.out.print("\nCarta na mesa: ");
-                cTopoCOMUM.imprimirCarta();
-                this.atual.jogarTurno(this);
-            }
-            System.out.println("\nFIM DE JOGO! O vencedor é: " + checarVencedor().getNome());
         }
     }
 
@@ -211,7 +145,7 @@ public class Jogo {
         else this.atual = atual.getDir();
     }
 
-    private Jogador checarVencedor() {
+    public Jogador checarVencedor() {
         if(this.atual.getMao().isEmpty()) {
             return this.atual;
         }

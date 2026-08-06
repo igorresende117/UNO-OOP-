@@ -1,6 +1,5 @@
 package baralhos;
 
-import cartas.Carta;
 import cartas.CartaUNO;
 import cartas.enums.AcaoUNO;
 import cartas.enums.Cor;
@@ -72,20 +71,5 @@ public class BaralhoUNO extends Baralho {
         }
 
         this.embaralha();
-    }
-
-    public void imprime() {
-        int i = 1;
-        for(Carta c : this.cartas) {
-            //Downcasting seguro para acessar os métodos exclusivos da CartaUNO
-            if(c instanceof CartaUNO cUNO) {
-                System.out.println("Carta " + i + ":");
-                System.out.println("Número: " + cUNO.getNum());
-                System.out.println("Cor: " + cUNO.getCor());
-                System.out.println("Ação: " + cUNO.getAcao());
-                System.out.println("\n");
-            }
-            i++;
-        }
     }
 }

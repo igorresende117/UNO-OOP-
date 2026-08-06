@@ -30,14 +30,7 @@ public abstract class Baralho {
         return this.cartas.getLast();
     }
 
-    public int getQuant() {
-        return this.cartas.size();
-    }
-
     public boolean isEmpty() {
         return this.cartas.isEmpty();
     }
-
-    //Cada tipo de baralho define sua própria formatação de impressão
-    public abstract void imprime();
 }
