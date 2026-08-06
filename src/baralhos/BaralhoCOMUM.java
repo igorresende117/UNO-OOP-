@@ -1,6 +1,5 @@
 package baralhos;
 
-import cartas.Carta;
 import cartas.CartaCOMUM;
 import cartas.enums.AcaoCOMUM;
 import cartas.enums.Naipe;
@@ -45,20 +44,5 @@ public class BaralhoCOMUM extends Baralho {
         cAux = new CartaCOMUM(AcaoCOMUM.JOKER_VERMELHO); this.cartas.add(cAux);
 
         this.embaralha();
-    }
-
-    public void imprime() {
-        int i = 1;
-        for(Carta c : this.cartas) {
-            //Downcasting seguro para acessar os métodos exclusivos da CartaCOMUM
-            if(c instanceof CartaCOMUM cCOMUM) {
-                System.out.println("Carta " + i + ":");
-                System.out.println("Número: " + cCOMUM.getNum());
-                System.out.println("Naipe: " + cCOMUM.getNaipe());
-                System.out.println("Ação: " + cCOMUM.getAcao());
-                System.out.println("\n");
-            }
-            i++;
-        }
     }
 }

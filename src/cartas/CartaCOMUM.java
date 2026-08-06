@@ -76,20 +76,6 @@ public class CartaCOMUM extends Carta {
             }
         }
         else if (this.acao == AcaoCOMUM.JOKER_PRETO || this.acao == AcaoCOMUM.JOKER_VERMELHO) {
-            java.util.Scanner scanner = new java.util.Scanner(System.in);
-            System.out.println("\nEscolha o novo naipe (1- COPAS | 2- PAUS | 3- ESPADAS | 4- OUROS): ");
-            int opcao = scanner.nextInt();
-
-            Naipe novoNaipe = switch (opcao) {
-                case 2 -> Naipe.PAUS;
-                case 3 -> Naipe.ESPADAS;
-                case 4 -> Naipe.OUROS;
-                default -> Naipe.COPAS;
-            };
-
-            contextoJogo.setNaipeAtualAtivo(novoNaipe);
-            System.out.println("O novo naipe da mesa agora é: " + novoNaipe);
-
             if (this.acao == AcaoCOMUM.JOKER_VERMELHO) {
                 //Joker Vermelho age como +4. Foca no alvo para ele comprar 4 e pular a vez
                 contextoJogo.passarTurno();

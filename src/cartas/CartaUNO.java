@@ -76,20 +76,6 @@ public class CartaUNO extends Carta {
             }
         }
         else if (this.acao == AcaoUNO.WILD || this.acao == AcaoUNO.WILD_MAIS_4) {
-            java.util.Scanner scanner = new java.util.Scanner(System.in);
-            System.out.println("\nEscolha a nova cor (1- VERMELHO | 2- AZUL | 3- VERDE | 4- AMARELO): ");
-            int opcao = scanner.nextInt();
-
-            Cor novaCor = switch (opcao) {
-                case 2 -> Cor.AZUL;
-                case 3 -> Cor.VERDE;
-                case 4 -> Cor.AMARELO;
-                default -> Cor.VERMELHO;
-            };
-
-            contextoJogo.setCorAtualAtiva(novaCor);
-            System.out.println("A nova cor da mesa agora é: " + novaCor);
-
             if (this.acao == AcaoUNO.WILD_MAIS_4) {
                 //Foca no alvo para ele comprar 4 e pular a vez
                 contextoJogo.passarTurno();
