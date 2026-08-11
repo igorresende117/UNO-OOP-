@@ -1,5 +1,7 @@
+import gui.*;
+
 public class APP {
     public static void main(String[] args) {
-        new gui.TelaInicial();
+        new TelaInicial();
     }
 }

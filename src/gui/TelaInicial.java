@@ -2,7 +2,7 @@ package gui;
 
 import modelo.Jogo;
 
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -23,33 +23,60 @@ public class TelaInicial extends JFrame {
 
     public TelaInicial() {
         super("Configuração Inicial");
-        this.setLayout(new FlowLayout());
+
+        //Usa BorderLayout para estruturar a janela inteira
+        this.setLayout(new BorderLayout());
 
         ImageIcon icone = new ImageIcon("IconeUNO.png");
         this.setIconImage(icone.getImage());
 
-        //1) Instanciando os componentes
+        //Cria um painel central alinhado verticalmente com margens
+        JPanel painelCentral = new JPanel();
+        painelCentral.setLayout(new BoxLayout(painelCentral, BoxLayout.Y_AXIS));
+        painelCentral.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        //1) Instanciando e centralizando os componentes
         this.labelInstrucao = new JLabel("Nome do Jogador:");
-        this.campoNome = new JTextField(15); //15 é o tamanho da caixa de texto
+        this.labelInstrucao.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        this.campoNome = new JTextField();
+        this.campoNome.setMaximumSize(new Dimension(250, 30));
+        this.campoNome.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         this.botaoAdicionar = new JButton("Adicionar");
+        this.botaoAdicionar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         this.labelContador = new JLabel("Jogadores adicionados: 0");
+        this.labelContador.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         String[] opcoesModo = {"1 - Oficial (UNO)", "2 - Convencional"};
         this.comboModo = new JComboBox<>(opcoesModo);
-        this.botaoIniciar = new JButton("Iniciar Partida");
+        this.comboModo.setMaximumSize(new Dimension(200, 30));
+        this.comboModo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        //2) Adicionando os componentes na janela
-        this.add(this.labelInstrucao);
-        this.add(this.campoNome);
-        this.add(this.botaoAdicionar);
-        this.add(this.labelContador);
-        this.add(this.comboModo);
-        this.add(this.botaoIniciar);
+        this.botaoIniciar = new JButton("Iniciar Partida");
+        this.botaoIniciar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        //2) Adicionando os componentes no painel com espaçamentos
+        painelCentral.add(this.labelInstrucao);
+        painelCentral.add(Box.createRigidArea(new Dimension(0, 5)));
+        painelCentral.add(this.campoNome);
+        painelCentral.add(Box.createRigidArea(new Dimension(0, 10)));
+        painelCentral.add(this.botaoAdicionar);
+        painelCentral.add(Box.createRigidArea(new Dimension(0, 15)));
+        painelCentral.add(this.labelContador);
+        painelCentral.add(Box.createRigidArea(new Dimension(0, 20)));
+        painelCentral.add(new JLabel("Modo de Jogo:") {{ setAlignmentX(Component.CENTER_ALIGNMENT); }});
+        painelCentral.add(Box.createRigidArea(new Dimension(0, 5)));
+        painelCentral.add(this.comboModo);
+        painelCentral.add(Box.createRigidArea(new Dimension(0, 25)));
+        painelCentral.add(this.botaoIniciar);
+
+        this.add(painelCentral, BorderLayout.CENTER);
 
         this.botaoAdicionar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //Pega o texto digitado e remove espaços vazios
                 String nome = campoNome.getText().trim();
-
                 if(!nome.isEmpty()) {
                     nomesJogadores.add(nome);
                     labelContador.setText("Jogadores adicionados: " + nomesJogadores.size());
@@ -60,27 +87,18 @@ public class TelaInicial extends JFrame {
 
         this.botaoIniciar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //Garante o mínimo de 2 jogadores conforme as regras
                 if (nomesJogadores.size() >= 2) {
-                    //getSelectedIndex retorna 0 ou 1, soma 1 para ficar 1 ou 2.
                     int modoEscolhido = comboModo.getSelectedIndex() + 1;
-
                     Jogo jogo = new Jogo(nomesJogadores, modoEscolhido);
-
-                    //Fecha janela de configuração
                     dispose();
-
-                    //Abre a tela principal passando o motor do jogo pra ela
                     new TelaJogo(jogo);
                 } else {
-                    //Avisa o usuário se ele tentar começar sozinho
                     JOptionPane.showMessageDialog(null, "Você precisa de pelo menos 2 jogadores para iniciar!");
                 }
             }
         });
 
-        //Configurações gerais
-        this.setSize(400, 300);
+        this.setSize(400, 400);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);

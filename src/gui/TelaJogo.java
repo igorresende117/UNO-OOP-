@@ -30,23 +30,22 @@ public class TelaJogo extends JFrame {
     public TelaJogo(Jogo jogo) {
         super("Mesa de Jogo");
         this.jogoAtual = jogo;
-        this.setLayout(new FlowLayout());
+
+        //Troca o FlowLayout por BorderLayout com 10px de margem
+        this.setLayout(new BorderLayout(10, 10));
 
         ImageIcon icone = new ImageIcon("IconeUNO.png");
         this.setIconImage(icone.getImage());
 
-        //Puxa o nome do jogador atual do jogo (definido na tela inicial)
+        //Painel com as informações da mesa no topo
+        JPanel painelInfo = new JPanel(new GridLayout(2, 1, 0, 5));
+        painelInfo.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
         this.labelVez = new JLabel("Vez do(a) jogador(a): " + this.jogoAtual.getAtual().getNome());
-        this.add(this.labelVez);
+        this.labelVez.setFont(new Font("Arial", Font.PLAIN, 14));
+        this.labelVez.setHorizontalAlignment(SwingConstants.CENTER);
 
-        //Cria o painel para as cartas usando GridLayout (0 linhas livres, até 6 colunas por linha)
-        this.painelMao = new JPanel(new GridLayout(0, 6, 5, 5));
-
-        //Puxa a mão do jogador atual e a carta do topo da mesa
-        ArrayList<Carta> mao = this.jogoAtual.getAtual().getMao();
         Carta cartaTopo = this.jogoAtual.getPilhaDescarte().peek();
-
-        //Formata o texto da carta do topo
         String textoTopo = "Topo da mesa: ";
         if(cartaTopo instanceof CartaUNO cTopoUNO) {
             if(cTopoUNO.getAcao() != null) {
@@ -55,18 +54,24 @@ public class TelaJogo extends JFrame {
                 textoTopo += cTopoUNO.getCor() + " | " + cTopoUNO.getNum();
             }
         }
-
         this.labelTopo = new JLabel(textoTopo);
-        this.labelTopo.setFont(new Font("Arial", Font.BOLD, 16));
-        this.add(this.labelTopo);
+        this.labelTopo.setFont(new Font("Arial", Font.BOLD, 18));
+        this.labelTopo.setHorizontalAlignment(SwingConstants.CENTER);
 
-        //Cria um botão para cada carta na mão
+        painelInfo.add(this.labelVez);
+        painelInfo.add(this.labelTopo);
+        this.add(painelInfo, BorderLayout.NORTH);
+
+        //Painel central para a mão do jogador
+        this.painelMao = new JPanel(new GridLayout(0, 6, 10, 10));
+        this.painelMao.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        ArrayList<Carta> mao = this.jogoAtual.getAtual().getMao();
+
         for(Carta c : mao) {
             String textoCarta = "";
-            Color corTexto = Color.BLACK; //(Curingas)
+            Color corTexto = Color.BLACK;
 
             if(c instanceof CartaUNO cUNO) {
-                //Limpa os nulls e -1 do texto
                 if(cUNO.getAcao() != null) {
                     if(cUNO.getCor() != null) {
                         textoCarta = cUNO.getCor() + " | " + cUNO.getAcao();
@@ -77,13 +82,12 @@ public class TelaJogo extends JFrame {
                     textoCarta = cUNO.getCor() + " | " + cUNO.getNum();
                 }
 
-                //Pega a cor para pintar a letra
                 if(cUNO.getCor() != null) {
                     switch(cUNO.getCor().toString()) {
                         case "VERMELHO": corTexto = Color.RED; break;
                         case "AZUL": corTexto = Color.BLUE; break;
-                        case "VERDE": corTexto = new Color(0, 153, 0); break; //Verde mais escuro pra ler bem
-                        case "AMARELO": corTexto = new Color(204, 153, 0); break; //Amarelo mais escuro pra ler bem
+                        case "VERDE": corTexto = new Color(0, 153, 0); break;
+                        case "AMARELO": corTexto = new Color(204, 153, 0); break;
                     }
                 }
             }
@@ -96,17 +100,15 @@ public class TelaJogo extends JFrame {
             }
 
             JButton botaoCarta = new JButton(textoCarta);
-            botaoCarta.setForeground(corTexto); //Muda a cor da letra
+            botaoCarta.setForeground(corTexto);
+            botaoCarta.setFont(new Font("Arial", Font.BOLD, 12));
 
-            //Desabilita o botão se a carta não puder ser jogada em cima do topo
             if(!c.servePJ(cartaTopo, this.jogoAtual)) {
                 botaoCarta.setEnabled(false);
             }
 
-            //Ação de clicar e jogar a carta na mesa
             botaoCarta.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    //Se for Curinga do UNO, abre um pop-up para escolher a cor
                     if (c instanceof CartaUNO cUNO && (cUNO.getAcao() == cartas.enums.AcaoUNO.WILD || cUNO.getAcao() == cartas.enums.AcaoUNO.WILD_MAIS_4)) {
                         String[] cores = {"Vermelho", "Azul", "Verde", "Amarelo"};
                         int escolha = JOptionPane.showOptionDialog(null, "Escolha a nova cor para a mesa:", "Carta Curinga",
@@ -120,7 +122,6 @@ public class TelaJogo extends JFrame {
                         };
                         jogoAtual.setCorAtualAtiva(novaCor);
                     }
-                    //Se for Curinga Comum (Joker), abre um pop-up para escolher o naipe
                     else if (c instanceof CartaCOMUM cCOMUM && (cCOMUM.getAcao() == cartas.enums.AcaoCOMUM.JOKER_PRETO || cCOMUM.getAcao() == cartas.enums.AcaoCOMUM.JOKER_VERMELHO)) {
                         String[] naipes = {"Copas", "Paus", "Espadas", "Ouros"};
                         int escolha = JOptionPane.showOptionDialog(null, "Escolha o novo naipe para a mesa:", "Carta Curinga",
@@ -135,23 +136,15 @@ public class TelaJogo extends JFrame {
                         jogoAtual.setNaipeAtualAtivo(novoNaipe);
                     }
 
-                    //1. Remove a carta da mão do jogador atual
                     jogoAtual.getAtual().getMao().remove(c);
 
-                    //Checa vencedor
                     if(jogoAtual.checarVencedor() != null) {
                         JOptionPane.showMessageDialog(null, "PARABÉNS! O jogador " + jogoAtual.getAtual().getNome() + " venceu a partida!", "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
-
-                        System.exit(0); //Fecha o jogo
+                        System.exit(0);
                     }
 
-                    //2. Empilha a carta no descarte
                     jogoAtual.getPilhaDescarte().push(c);
-
-                    //3. Aplica o efeito correspondente no motor do jogo
                     c.aplicaEfeito(jogoAtual);
-
-                    //4. Reseta a flag de compra, passa o turno para o próximo e atualiza a tela
                     jogoAtual.getAtual().setJaComprou(false);
                     jogoAtual.passarTurno();
 
@@ -163,58 +156,51 @@ public class TelaJogo extends JFrame {
             this.painelMao.add(botaoCarta);
         }
 
-        //Adiciona o painel da mão completo na janela
-        this.add(this.painelMao);
+        //Envolve a grade de cartas em um scroll e remove a borda
+        JScrollPane scrollMao = new JScrollPane(this.painelMao);
+        scrollMao.setBorder(null);
+        this.add(scrollMao, BorderLayout.CENTER);
 
-        //Cria um painel separado para os botões de ação não misturarem com as cartas
-        this.painelAcoes = new JPanel(new FlowLayout());
+        //Painel inferior para os botões de ação
+        this.painelAcoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        this.painelAcoes.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
 
         this.botaoComprar = new JButton("Comprar Carta");
         this.botaoPassar = new JButton("Passar Vez");
+        this.botaoComprar.setPreferredSize(new Dimension(150, 40));
+        this.botaoPassar.setPreferredSize(new Dimension(150, 40));
 
-        //Trava o botão de compra se o jogador já tiver puxado carta neste turno
         if(this.jogoAtual.getAtual().getJaComprou()) {
             this.botaoComprar.setEnabled(false);
         }
 
         this.painelAcoes.add(this.botaoComprar);
         this.painelAcoes.add(this.botaoPassar);
+        this.add(this.painelAcoes, BorderLayout.SOUTH);
 
-        //Adiciona o painel de ações na janela
-        this.add(this.painelAcoes);
-
-        //Ação do botão de comprar
         this.botaoComprar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //Se o baralho principal estiver vazio, reabastecer
                 if(jogoAtual.getPilhaCompra().isEmpty()) {
                     jogoAtual.reabastecerBaralho();
                     JOptionPane.showMessageDialog(null, "O baralho de compra foi reabastecido com o descarte!", "Aviso", JOptionPane.INFORMATION_MESSAGE);
                 }
-
-                //Adiciona a carta na mão e marca que já comprou, sem passar o turno
                 jogoAtual.getAtual().comprarCarta(jogoAtual.getPilhaCompra());
                 jogoAtual.getAtual().setJaComprou(true);
-
-                //Recarrega a tela para desabilitar o botão e mostrar a carta nova
                 dispose();
                 new TelaJogo(jogoAtual);
             }
         });
 
-        //Ação do botão de passar a vez
         this.botaoPassar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //Reseta a flag de compra do jogador atual antes de girar a mesa
                 jogoAtual.getAtual().setJaComprou(false);
                 jogoAtual.passarTurno();
-
                 dispose();
                 new TelaJogo(jogoAtual);
             }
         });
 
-        this.setSize(1100, 600);
+        this.setSize(950, 600);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
