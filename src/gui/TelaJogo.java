@@ -34,8 +34,15 @@ public class TelaJogo extends JFrame {
         //Troca o FlowLayout por BorderLayout com 10px de margem
         this.setLayout(new BorderLayout(10, 10));
 
-        ImageIcon icone = new ImageIcon("IconeUNO.png");
-        this.setIconImage(icone.getImage());
+        try {
+            java.io.InputStream streamIcone = getClass().getResourceAsStream("/IconeUNO.png");
+            if (streamIcone != null) {
+                java.awt.Image imagem = javax.imageio.ImageIO.read(streamIcone);
+                this.setIconImage(imagem);
+            }
+        } catch (Exception ex) {
+            System.out.println("Ícone não encontrado pelo executável.");
+        }
 
         //Painel com as informações da mesa no topo
         JPanel painelInfo = new JPanel(new GridLayout(2, 1, 0, 5));
@@ -47,13 +54,17 @@ public class TelaJogo extends JFrame {
 
         Carta cartaTopo = this.jogoAtual.getPilhaDescarte().peek();
         String textoTopo = "Topo da mesa: ";
-        if(cartaTopo instanceof CartaUNO cTopoUNO) {
+
+        // CORREÇÃO: Casting clássico no topo
+        if(cartaTopo instanceof CartaUNO) {
+            CartaUNO cTopoUNO = (CartaUNO) cartaTopo;
             if(cTopoUNO.getAcao() != null) {
                 textoTopo += (cTopoUNO.getCor() != null ? cTopoUNO.getCor() + " | " : "") + cTopoUNO.getAcao();
             } else {
                 textoTopo += cTopoUNO.getCor() + " | " + cTopoUNO.getNum();
             }
         }
+
         this.labelTopo = new JLabel(textoTopo);
         this.labelTopo.setFont(new Font("Arial", Font.BOLD, 18));
         this.labelTopo.setHorizontalAlignment(SwingConstants.CENTER);
@@ -71,7 +82,9 @@ public class TelaJogo extends JFrame {
             String textoCarta = "";
             Color corTexto = Color.BLACK;
 
-            if(c instanceof CartaUNO cUNO) {
+            // CORREÇÃO: Casting clássico na renderização da mão
+            if(c instanceof CartaUNO) {
+                CartaUNO cUNO = (CartaUNO) c;
                 if(cUNO.getAcao() != null) {
                     if(cUNO.getCor() != null) {
                         textoCarta = cUNO.getCor() + " | " + cUNO.getAcao();
@@ -91,7 +104,8 @@ public class TelaJogo extends JFrame {
                     }
                 }
             }
-            else if(c instanceof CartaCOMUM cCOMUM) {
+            else if(c instanceof CartaCOMUM) {
+                CartaCOMUM cCOMUM = (CartaCOMUM) c;
                 if(cCOMUM.getAcao() != null) {
                     textoCarta = cCOMUM.getNaipe() + " | " + cCOMUM.getAcao();
                 } else {
@@ -109,31 +123,41 @@ public class TelaJogo extends JFrame {
 
             botaoCarta.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if (c instanceof CartaUNO cUNO && (cUNO.getAcao() == cartas.enums.AcaoUNO.WILD || cUNO.getAcao() == cartas.enums.AcaoUNO.WILD_MAIS_4)) {
-                        String[] cores = {"Vermelho", "Azul", "Verde", "Amarelo"};
-                        int escolha = JOptionPane.showOptionDialog(null, "Escolha a nova cor para a mesa:", "Carta Curinga",
-                                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, cores, cores[0]);
+                    // CORREÇÃO: Quebra do IF e conversão para o Switch tradicional no UNO
+                    if (c instanceof CartaUNO) {
+                        CartaUNO cUNO = (CartaUNO) c;
+                        if(cUNO.getAcao() == cartas.enums.AcaoUNO.WILD || cUNO.getAcao() == cartas.enums.AcaoUNO.WILD_MAIS_4) {
+                            String[] cores = {"Vermelho", "Azul", "Verde", "Amarelo"};
+                            int escolha = JOptionPane.showOptionDialog(null, "Escolha a nova cor para a mesa:", "Carta Curinga",
+                                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, cores, cores[0]);
 
-                        cartas.enums.Cor novaCor = switch (escolha) {
-                            case 1 -> cartas.enums.Cor.AZUL;
-                            case 2 -> cartas.enums.Cor.VERDE;
-                            case 3 -> cartas.enums.Cor.AMARELO;
-                            default -> cartas.enums.Cor.VERMELHO;
-                        };
-                        jogoAtual.setCorAtualAtiva(novaCor);
+                            cartas.enums.Cor novaCor;
+                            switch (escolha) {
+                                case 1: novaCor = cartas.enums.Cor.AZUL; break;
+                                case 2: novaCor = cartas.enums.Cor.VERDE; break;
+                                case 3: novaCor = cartas.enums.Cor.AMARELO; break;
+                                default: novaCor = cartas.enums.Cor.VERMELHO; break;
+                            }
+                            jogoAtual.setCorAtualAtiva(novaCor);
+                        }
                     }
-                    else if (c instanceof CartaCOMUM cCOMUM && (cCOMUM.getAcao() == cartas.enums.AcaoCOMUM.JOKER_PRETO || cCOMUM.getAcao() == cartas.enums.AcaoCOMUM.JOKER_VERMELHO)) {
-                        String[] naipes = {"Copas", "Paus", "Espadas", "Ouros"};
-                        int escolha = JOptionPane.showOptionDialog(null, "Escolha o novo naipe para a mesa:", "Carta Curinga",
-                                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, naipes, naipes[0]);
+                    // CORREÇÃO: Quebra do IF e conversão para o Switch tradicional no COMUM
+                    else if (c instanceof CartaCOMUM) {
+                        CartaCOMUM cCOMUM = (CartaCOMUM) c;
+                        if(cCOMUM.getAcao() == cartas.enums.AcaoCOMUM.JOKER_PRETO || cCOMUM.getAcao() == cartas.enums.AcaoCOMUM.JOKER_VERMELHO) {
+                            String[] naipes = {"Copas", "Paus", "Espadas", "Ouros"};
+                            int escolha = JOptionPane.showOptionDialog(null, "Escolha o novo naipe para a mesa:", "Carta Curinga",
+                                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, naipes, naipes[0]);
 
-                        cartas.enums.Naipe novoNaipe = switch (escolha) {
-                            case 1 -> cartas.enums.Naipe.PAUS;
-                            case 2 -> cartas.enums.Naipe.ESPADAS;
-                            case 3 -> cartas.enums.Naipe.OUROS;
-                            default -> cartas.enums.Naipe.COPAS;
-                        };
-                        jogoAtual.setNaipeAtualAtivo(novoNaipe);
+                            cartas.enums.Naipe novoNaipe;
+                            switch (escolha) {
+                                case 1: novoNaipe = cartas.enums.Naipe.PAUS; break;
+                                case 2: novoNaipe = cartas.enums.Naipe.ESPADAS; break;
+                                case 3: novoNaipe = cartas.enums.Naipe.OUROS; break;
+                                default: novoNaipe = cartas.enums.Naipe.COPAS; break;
+                            }
+                            jogoAtual.setNaipeAtualAtivo(novoNaipe);
+                        }
                     }
 
                     jogoAtual.getAtual().getMao().remove(c);

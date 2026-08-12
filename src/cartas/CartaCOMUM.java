@@ -34,8 +34,10 @@ public class CartaCOMUM extends Carta {
         //Curingas podem ser jogados em cima de qualquer carta
         if(this.acao == AcaoCOMUM.JOKER_PRETO || this.acao == AcaoCOMUM.JOKER_VERMELHO) return true;
 
-        //Downcasting seguro para comparar atributos específicos do baralho comum
-        if(cartaTopo instanceof CartaCOMUM topoCOMUM){
+        // CORREÇÃO: Usando o instanceof e o downcasting clássicos para evitar erro de versão
+        if(cartaTopo instanceof CartaCOMUM){
+            CartaCOMUM topoCOMUM = (CartaCOMUM) cartaTopo;
+
             if(this.naipe == topoCOMUM.getNaipe() ||
                     this.naipe == contextoJogo.getNaipeAtualAtivo() || //Verifica o naipe escolhido após um Curinga
                     (this.numero > -1 && this.numero == topoCOMUM.getNum()) ||

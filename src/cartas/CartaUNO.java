@@ -34,8 +34,10 @@ public class CartaUNO extends Carta {
         //Curingas podem ser jogados em cima de qualquer carta
         if(this.acao == AcaoUNO.WILD || this.acao == AcaoUNO.WILD_MAIS_4) return true;
 
-        //Downcasting seguro para comparar atributos específicos do baralho UNO
-        if(cartaTopo instanceof CartaUNO topoUNO){
+        // CORREÇÃO: Usando o instanceof e o downcasting clássicos
+        if(cartaTopo instanceof CartaUNO){
+            CartaUNO topoUNO = (CartaUNO) cartaTopo;
+
             if(this.cor == topoUNO.getCor() ||
                     this.cor == contextoJogo.getCorAtualAtiva() || //Verifica a cor escolhida após um Curinga
                     (this.numero > -1 && this.numero == topoUNO.getNum()) ||

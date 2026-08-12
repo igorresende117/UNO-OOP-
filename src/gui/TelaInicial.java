@@ -27,8 +27,15 @@ public class TelaInicial extends JFrame {
         //Usa BorderLayout para estruturar a janela inteira
         this.setLayout(new BorderLayout());
 
-        ImageIcon icone = new ImageIcon("IconeUNO.png");
-        this.setIconImage(icone.getImage());
+        try {
+            java.io.InputStream streamIcone = getClass().getResourceAsStream("/IconeUNO.png");
+            if (streamIcone != null) {
+                java.awt.Image imagem = javax.imageio.ImageIO.read(streamIcone);
+                this.setIconImage(imagem);
+            }
+        } catch (Exception ex) {
+            System.out.println("Ícone não encontrado pelo executável.");
+        }
 
         //Cria um painel central alinhado verticalmente com margens
         JPanel painelCentral = new JPanel();
