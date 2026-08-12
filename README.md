@@ -16,13 +16,13 @@ A complete, Object-Oriented card game engine developed in Java. This project sup
 ## Screenshots
 
 ### Initial Configuration
-![Tela Inicial](./assets/tela_inicial.png)
+![Tela Inicial](./assets/tela_inicial.jpeg)
 
 ### Game Table
-![Mesa de Jogo](./assets/tela_jogo.png)
+![Mesa de Jogo](./assets/tela_jogo.jpeg)
 
 ### Victory Screen
-![Vitoria](./assets/vitoria.png)
+![Vitoria](./assets/vitoria.jpeg)
 
 ## Versions
 
