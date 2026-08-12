@@ -17,17 +17,18 @@ public abstract class Baralho {
 
     //Adiciona uma carta no topo da pilha
     public void push(Carta carta) {
-        this.cartas.addLast(carta);
+        this.cartas.add(carta);
     }
 
     //Remove e retorna a carta do topo
     public Carta pop() {
-        return this.cartas.removeLast();
+        // Pega o tamanho da lista - 1 para acessar e remover o último elemento
+        return this.cartas.remove(this.cartas.size() - 1);
     }
 
     //Retorna a carta do topo sem remover
     public Carta peek() {
-        return this.cartas.getLast();
+        return this.cartas.get(this.cartas.size() - 1);
     }
 
     public boolean isEmpty() {
